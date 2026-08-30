@@ -25,3 +25,4 @@ What else is GitHub normally used for?
 
 What else are we going to use RStudio for?
 
+Where are we going to put our data?
