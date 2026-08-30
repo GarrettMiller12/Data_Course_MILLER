@@ -22,3 +22,6 @@ I have never coded before so this has been very exciting
 How often do I need to practice to get good at this?
 
 What else is GitHub normally used for?
+
+What else are we going to use RStudio for?
+
