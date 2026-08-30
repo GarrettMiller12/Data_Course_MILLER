@@ -9,6 +9,8 @@ Added course directories and completed setup requirements.
 **Author:** Garrett Miller
 **Institution:** Utah Valley University
 
+## Questions
+
 I am understanding how git works much better
 
 I am excited for where this class is going to go
