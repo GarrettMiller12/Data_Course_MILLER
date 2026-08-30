@@ -4,3 +4,4 @@ Made changes and pushed them
 Added course directories and completed setup requirements.
 **Author:** Garrett Miller
 **Institution:** Utah Valley University
+I am understanding how git works much better
