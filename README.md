@@ -6,3 +6,4 @@ Added course directories and completed setup requirements.
 **Institution:** Utah Valley University
 I am understanding how git works much better
 I am excited for where this class is going to go
+I have never coded before so this has been very exciting
