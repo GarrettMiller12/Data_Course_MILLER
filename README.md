@@ -9,13 +9,15 @@ Added course directories and completed setup requirements.
 **Author:** Garrett Miller
 **Institution:** Utah Valley University
 
-## Questions
+## Comments
 
 I am understanding how git works much better
 
 I am excited for where this class is going to go
 
 I have never coded before so this has been very exciting
+
+## Questions
 
 How often do I need to practice to get good at this?
 
