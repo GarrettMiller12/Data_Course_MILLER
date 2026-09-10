@@ -8,10 +8,10 @@ head(df, n = 5)
 
 b_files <- list.files(path = "Data" , pattern = "^b" , full.names = TRUE, recursive = TRUE)
 
-for(file in b_files) {
-  print(readLines(file, n = 1))
+for(i in 1:length(b_files)) {
+  print(readLines(b_files[i], n = 1))
 }
 
-for(file in csv_files) {
-  print(readLines(file, n = 1))
+for(i in 1:length(csv_files)) {
+  print(readLines(csv_files[i], n = 1))
 }
