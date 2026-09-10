@@ -31,7 +31,10 @@
 
 bob = 3+4 # This assigns the evaluated function (3 + 4) to an object (like a variable) called "bob"
 # bob should equal 7
+bob
 jane <- 5*2 # This assigns the value of 5 times 2 to an object called "jane" - Either symbol works
+jane
+
 
 # LOGICAL EVALUATIONS
 
@@ -62,10 +65,12 @@ jane == 10
 # One way to manually enter data is with the command c() 
 # That stands for "concatenate" and allows you to enter a series of values to be saved to a single object:
 billy = c(2,3,4,5,6) # "billy" is now a NUMERIC VECTOR of 5 values
+billy
 # c() requires you to separate the various elements with a comma
 
 # This works for STRINGS as well. Strings are made up of characters
 suzy = c("This","is","a","character","vector") # notice how each string is enclosed in quotes. That tells R it is a string
+suzy
 
 # Think of these values (billy and suzy) like lists.  They have inherent order, so we can access any part of them:
 
@@ -77,7 +82,7 @@ billy[1] # The brackets [] allow you to pick one or more elements from an object
 # during each observation, that is 2-dimensional. Let's input some fake biological data to take a look:
 # we can pretend that we collected 10 random fruit flies and measured their wingspan and mass
 
-observation = c(1,2,3,4,5,6,7,8,9,10) # our vector of observations from a reeated experiment
+observation = c(1,2,3,4,5,6,7,8,9,10) # our vector of observations from a repeated experiment
 wingspan = c(1.2,1.4,1.0,1.2,1.8,2.0,2.2,1.1,2.3,2.0) # our vector of wingspans
 mass = c(0.43,0.44,0.32,0.44,0.52,0.55,0.56,0.42,0.51,0.57) # our vector of mass
 
