@@ -160,6 +160,7 @@ dbinom(50,100,.5) # probability of getting exactly 50 heads out of 100 coin flip
 # 1.  Get a subset of the "iris" data frame where it's just even-numbered rows
 
 seq(2,150,2) # here's the code to get a list of the even numbers between 2 and 150
+dat <- iris
 even_dat <- dat[seq(2,nrow(dat),2),]
 even_dat
 str(even_dat)
@@ -174,15 +175,17 @@ str(iris_chr)
 Sepal.Length <- iris$Sepal.Length
 Sepal.Width <- iris$Sepal.Width
 Sepal.Area <- Sepal.Length*Sepal.Width
+Sepal.Area
 
 # 4.  Add Sepal.Area to the iris data frame as a new column
 iris$Sepal.Area <- Sepal.Area
 iris
 
 # 5.  Create a new dataframe that is a subset of iris using only rows where Sepal.Area is greater than 20 
-      # (name it big_area_iris)
+# (name it big_area_iris)
 
 big_area_iris <- iris[iris$Sepal.Area > 20, ]
+big_area_iris
 
 
 # 6.  Upload the last numbered section of this R script (with all answers filled in and tasks completed) 
