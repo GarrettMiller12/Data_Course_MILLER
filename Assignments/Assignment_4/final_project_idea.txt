@@ -1,0 +1,10 @@
+Assignment 4: 
+
+Idea for final project: Analyze the impact of spin rate and movement profiles on whiff percentage and overall performance in MLB baseball.
+I would want to look at whiff percentage which is how often the hitter swings and misses at a pitch. I would also want to look at the CSW% which is the called strike plus whiff percentage giving an overall overlook about how well a pitch performs. 
+
+Primary data: The MLB has a collection of every pitch from every game since they started using the data system Stat Cast. These data sets are available to the public and give data on spin rate, velocity, movement, and the end result. I would also possibly use other minor sources that record how well a pitch performs based on its spin rate, movement profile, and speed.
+These data sets normally include each individual pitch, what pitch it is, who is throwing it, how much it is spinning in RPM's, speed in MPH, Induced vertical break, induced horizontal break, and the result of the pitch.
+Induced vertical break is the break the pitch experiences excluding the impact of the air it travels through. In simpler terms it is the amount of vertical break that the pitcher forces the ball to have based entirely on spin rate basically how the ball would move if it was thrown in a vacuum with no gravity. Positive IVB means the pitch stays more flat and can almost appear to rise. A negative IVB means the ball is moving downward.
+Induced horizontal break is the same idea as IVB just in the horizontal direction so east and west. Like IVB the direction stays constant whether the pitcher is left handed or right handed. A negative number indicates the ball is moving to the left and a positive number means the ball is moving right based on the spin being generated.b
+
