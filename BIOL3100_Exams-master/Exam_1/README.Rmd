@@ -50,8 +50,33 @@ skimr::skim(df)
 **I.**
 **Read the cleaned_covid_data.csv file into an R data frame. (20 pts)**
 
+##The <- tells R studio to make this an object## 
+##The read.csv tells R studio to read the data from the cleaned_covid_data.csv file##
+
+covid_data <- read.csv("data/cleaned_covid_data.csv")
+
+
+
+
+
+
 **II.**
 **Subset the data set to just show states that begin with "A" and save this as an object called A_states. (20 pts)**
+
+##Load the tidyverse package##
+library(tidyverse)
+
+
+##The <- creates and object called A_states##
+##The covid_data tells R what object to read the data from##
+##Filter tells R to filter out the data based on what is inside the parenthesis##
+##startsWith (Province_state, "A") Tells R to look at the Province_State column and filter out the ones that begin with the letter A##
+
+A_states <- covid_data |> 
+  filter(startsWith(Province_State, "A"))
+
+##This lone A_states shows the data in the object letting me check if it performed the task correctly##   
+A_states
 
  + Use the *tidyverse* suite of packages
  + Selecting rows where the state starts with "A" is tricky (you can use the grepl() function or just a vector of those states if you prefer)
@@ -59,12 +84,46 @@ skimr::skim(df)
 **III.**
 **Create a plot _of that subset_ showing Deaths over time, with a separate facet for each state. (20 pts)**
 
+##ggplot tells R Studio to use the ggplot package##
+##data = A_states tells R studio to get the data from the object A_states##
+##mapping = aes tells R how to format the scatterplots and what to label the x and y axis##
+##geom_point() tells R studio to generate a scatterplot##
+##geom_smooth(method = "loess" , se = FALSE) tells R studio to add loess lines to the scatter plots##
+##facet_wrap tells R studio to make a different graph for each different state and scales = free tells R studio to make the scale of the graphs depend on the data found in each column for each state## 
+
+ggplot(
+  data = A_states,
+  mapping = aes(x = Last_Update, y = Deaths)
+) +
+  geom_point() + 
+  geom_smooth(method = "loess", se = FALSE) + 
+  facet_wrap(~ Province_State, scales = "free") 
+
  + Create a scatterplot
  + Add loess curves WITHOUT standard error shading
  + Keep scales "free" in each facet
 
 **IV.** (Back to the full dataset)
 **Find the "peak" of Case_Fatality_Ratio for each state and save this as a new data frame object called state_max_fatality_rate. (20 pts)**
+
+## state_max_fatality_rate <- tells R studio to make a new object called state_max_fatality_rate ## 
+##covid_data |> tells R studio to make a pipe for the data set covid_data##
+##mutate(Case_Fatality_Ratio = Deaths / Confirmed) |> this tells R studio to mutate the data in covid_data and to make a new column titled Case_fatality_Ratio by dividing deaths by confirmed## 
+##group_by(Province_State) tells R studio to group the data by each state finding the Case_Fatality_Ratio for each individual state## 
+## summarize(Maximum_Fatality_Ratio = max(Case_Fatality_Ration, na.rm = TRUE)) tells R studio to create a new column called Maximum_Fatality_Ratio and put the max value of each state for the Case_Fatality_Ratio column in the new column##
+##The na.rm = TRUE tells R to ignore any missing values in order for the calculations to be performed correctly##
+## arrange(desc(Maximum_Fatality_Ratio)) this tells R studio how to arrange the column and to do so in descending order from highest fatality rate to lowest## 
+
+state_max_fatality_rate <- covid_data |> 
+  mutate(Case_Fatality_Ratio = Deaths / Confirmed) |>
+  group_by(Province_State) |> 
+  summarize(Maximum_Fatality_Ratio = max(Case_Fatality_Ratio, na.rm = TRUE)) |>
+  arrange(desc(Maximum_Fatality_Ratio)) 
+  
+##This lone state_max_fatality_rate lets me see if the code ran correctly## 
+
+state_max_fatality_rate
+
 
 I'm looking for a new data frame with 2 columns:
 
@@ -78,6 +137,19 @@ This might take a few steps. Be careful about how you deal with missing values!
 **V.**
 **Use that new data frame from task IV to create another plot. (20 pts)**
 
+##ggplot tells R studio to use the ggplot package to make the graph##
+##data = state_max_fatality_rate, tells R studio to use the state_max_fatality_rate object for the data in the graph##
+##mapping = aes(x = reorder(Province_State, -Maximum_Fatality_Ratio), y = Maximum_Fatality_Ratio) this tells R studio to make the graph have an x-axis of the Province_State characters and to rearrange them to be in descending order## 
+##geom_col() tells R studio to make a Bar graph##
+##theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) tells R studio to make the text on the x axis to rotate at a ninety degree angle. The vjust and hjust came from AI to help make the graph look good because I could not get it to look good without them## 
+
+ggplot(
+  data = state_max_fatality_rate,  
+  mapping = aes(x = reorder(Province_State, -Maximum_Fatality_Ratio), y = Maximum_Fatality_Ratio)
+) + 
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
  + X-axis is Province_State
  + Y-axis is Maximum_Fatality_Ratio
  + bar plot
@@ -89,6 +161,26 @@ Even with this partial data set (not current), you should be able to see that (w
 **VI.** (BONUS 10 pts)
 **Using the FULL data set, plot cumulative deaths for the entire US over time**
 
+##us_cumulative_deaths <- creates an object called us_cumulative_deaths##
+## covid_data |> uses the data from the data object covid_data##
+##group_by(Last_Update) this tells R studio to group the rows by each individual date to handle each day one at a time##
+##summarize(Total_Deaths = sum(Deaths. na.rm = TRUE)) tells R studio to add up all of the deaths across all the sates on the specific day creating a grand total for all of the US## 
+
+us_cumulative_deaths <- covid_data |>
+  group_by(Last_Update) |>
+  summarize(Total_Deaths = sum(Deaths, na.rm = TRUE))
+  
+##ggplot(data = us_cumulative_deaths) tells R studio to generate a plot using the data from us_cumulative_deaths##
+##mapping = aes(x = Last_Update, y = Total_Deaths, group = 1) tells R studio how to label the x and y axis. Group = 1 tells R studio to treat all of the individual dates as one group to generate a line##
+##geom_line(color = "blue", size = 1) tells R studio to add a line with descriptors of how the line should look##
+  
+ggplot(
+  data = us_cumulative_deaths,
+  mapping = aes(x = Last_Update, y = Total_Deaths, group = 1)
+) + 
+  geom_line(color = "blue", size = 1)
+  
+  
  + You'll need to read ahead a bit and use the dplyr package functions group_by() and summarize() to accomplish this.
 
 
