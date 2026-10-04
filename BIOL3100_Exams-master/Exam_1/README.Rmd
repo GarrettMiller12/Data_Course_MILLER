@@ -150,11 +150,13 @@ ggplot(
   geom_col() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
- + X-axis is Province_State
- + Y-axis is Maximum_Fatality_Ratio
- + bar plot
- + x-axis arranged in descending order, just like the data frame (make it a factor to accomplish this)
- + X-axis labels turned to 90 deg to be readable
+ 
+ 
+ 
+# + X-axis is Province_State
+# + bar plot
+# + x-axis arranged in descending order, just like the data frame (make it a factor to accomplish this)
+# + X-axis labels turned to 90 deg to be readable
  
 Even with this partial data set (not current), you should be able to see that (within these dates), different states had very different fatality ratios.
 
