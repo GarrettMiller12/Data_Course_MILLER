@@ -49,9 +49,82 @@ Here, we have real data from 4 environmental samples (two soil and two water sam
 
 # Your task is to Write an R script that:
 
-1.  Cleans this data into tidy (long) form
+library(gganimate)
+
+#1.  Cleans this data into tidy (long) form #
+
+# The tidy_biolog offers a new name for a newly created object that after running will now be in tidy form ##
+## pivot_longer allows me to change the columns and rows and in this instance the cols beginning with Hr_ are being changed to be labeled as time and the values were changed to have the label absorbance ##
+## The mutate script tells R studio to change the values in the column time to be just the number which drops the Hr_ making graphing in the future much easier ##
+
+tidy_biolog <- dat |>
+  pivot_longer(
+  cols = starts_with("Hr_"),
+  names_to = "Time",
+  values_to = "Absorbance"
+) |> 
+mutate(
+  Time = parse_number(Time))
+
+## This simple tidy_biolog pops up what the new object has as rows and columns and allows me to check if my script worked correctly ##
+
+tidy_biolog
+
+
 2.  Creates a new column specifying whether a sample is from soil or water
+
+# tidy_biolog tells R Studio to use the data in tidy_biolog and mutate tells R Studio to add a new column ##
+## Type = names the new column Type ##
+## if_else takes anything labeled as soil as a soil sample and if it does not contain soil it calls the sample a water sample ##
+
+tidy_biolog <- tidy_biolog |>
+  mutate(
+    Type = if_else(str_detect(`Sample ID`, "Soil"), "Soil", "Water")
+)
+
+## This simple tidy_biolog allows me to check if the script worked ##  
+
+tidy_biolog
+
+
 3.  Generates a plot that matches this one (note just plotting dilution == 0.1):
+
+## This plot_data creates a new object and first filters out just the dilution == 0.1 ##
+## summarize generates a mean value for the mean absorbance which is what generates only two lines on the graphs and without it it produces a whole bunch of zig zag lines ## 
+
+plot_data <- tidy_biolog |> 
+  filter(Dilution == 0.1) |> 
+  group_by(Type, Substrate, Time) |> 
+  summarize(mean_absorbance = mean(Absorbance, na.rm = TRUE), .groups = "drop")
+
+
+
+## ggplot tells R studio to plot using gg plot with x as time and y uses the data points from mean_absorbance which was created in the last script ##
+## geom_line generates a lateral line with a width of 0.8 and facet wrap and scale y generate how the graphs are generated and adding limits from 0,2 allowed me to make the graphs look just like the one in the assignment ##
+## Labs generates labels for the X axis, the y axis, a title, and color = Type tells ggplot to add different colors for each of the different types in that column ## 
+## theme allows me to generate a legend and the element_text allows me to dictate the size of the strip text, the axis text, and where the legend appears on the image ## 
+
+
+ggplot(plot_data, aes(x = Time, y = mean_absorbance, color = Type)) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ Substrate, scales = "free_y") +
+  scale_y_continuous(limits = c(0, 2)) +  
+  labs(
+    title = "Just dilution 0.1",
+    x = "Time",
+    y = "Absorbance",
+    color = "Type"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8),
+    axis.text = element_text(size = 7),
+    legend.position = "right"
+  )
+
+
+
+
 
 ```{r, echo=FALSE,out.width=600}
 knitr::include_graphics("../../../media/biolog.png")
@@ -60,6 +133,46 @@ knitr::include_graphics("../../../media/biolog.png")
 4.  Generates an animated plot that matches this one (absorbance values are mean of all 3 replicates for each group):
 
 This plot is just showing values for the substrate "Itaconic Acid"
+
+## anim_data is being generated as a new object that adds a filter for the substrate Itaconic acid #3
+## They are grouped by Sample_ID Dilution and time, then summarize generates the mean absorbance ## 
+
+anim_data <- tidy_biolog |> 
+  filter(Substrate == "Itaconic Acid") |> 
+  group_by(`Sample ID`, Dilution, Time) |> 
+  summarize(mean_absorbance = mean(Absorbance, na.rm = TRUE), .groups = "drop")
+
+
+## p <- generates a new object based on all of the things after that symbol ##
+## ggplot generates scatter plots based on the X = time, y is the mean_absorbance and the color is based on sample ID lables##
+## labs adds labels to the graphs including an X label a Y and the color labels ## 
+## The limits make the graphs look just like one in the assignment ## 
+## gganimate tells gganimate to animate the lines and reveal them over the time provided in the graphs ## 
+
+
+
+p <- ggplot(anim_data, aes(x = Time, y = mean_absorbance, color = `Sample ID`)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~ Dilution) +
+  scale_y_continuous(limits = c(0, 2.5)) +
+  labs(
+    x = "Time",
+    y = "Mean Absorbance",
+    color = "Sample ID"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 10),
+    axis.text = element_text(size = 8)
+  ) +
+  gganimate::transition_reveal(Time)
+  
+  
+## This final line tells the gganimate to animate the object p and how to animate it to look like the one in the assignment ##   
+  
+gganimate::animate(p, nframes = 100, fps = 10, width = 700, height = 500)
+
+
 
 ```{r, echo=FALSE,out.width=600}
 knitr::include_graphics("../../../media/biolog2.gif")
