@@ -1,0 +1,97 @@
+# First I had to load the Utah Religions by county into R and labeled it religions_raw #
+
+religions_raw <- read_csv("Utah_Religions_by_County.csv")
+
+# Then the script below gave me a glimpse as to what the data looked like with no changes #
+
+glimpse(religions_raw) 
+
+# I then wanted to tidy up some of the data and decided to make the wide format into the long format by instead of having 14 different columns for 14 different religions it takes the county an creates 14 different rows for each religion #
+
+religions_tidy <- religions_raw %>%
+  pivot_longer(
+    cols = -c(County, Pop_2010, Religious),
+    names_to = "Religion",
+    values_to = "Proportion"
+  )
+
+# We can then look at the refined data #
+
+glimpse(religions_tidy)
+
+# The next step was to create figures to explore the cleaned data set #
+# My first idea was to look at how much variation there was between the population of a larger county versus the smaller ones # 
+
+ggplot(religions_raw, aes(x = reorder(County, Pop_2010), y = Pop_2010)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Population by Utah County (2010)",
+    x = "County",
+    y = "Population"
+  ) +
+  theme_minimal()
+
+# After looking at the varience in population I then wanted to investiagte the proportions of religions across those counties # 
+
+ggplot(religions_tidy, aes(x = Proportion)) +
+  geom_histogram(bins = 10, fill = "steelblue", color = "white") +
+  facet_wrap(~ Religion, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Proportions by Religious Group",
+    x = "Proportion in County",
+    y = "Count of Counties"
+  )
+
+# To answer the first question in the task section I decided to make a plot that placed a line of best fit on a graph of county population versus religious proportions # 
+
+ggplot(religions_tidy, aes(x = Pop_2010, y = Proportion)) +
+  geom_point(aes(color = Religion), alpha = 0.7, show.legend = FALSE) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  scale_x_log10(labels = scales::comma) +
+  facet_wrap(~ Religion, scales = "free_y") +
+  labs(
+    title = "County Population vs. Proportion of Religious Groups",
+    x = "County Population (Log10 Scale)",
+    y = "Proportion in County"
+  ) +
+  theme_minimal()
+
+# Looking at the slope of the best fit lines gives insight into the effect of population size on the proportion of religious groups # 
+# Flat lines are religions that do not get influenced by population size #
+# Slanted upward lines are influenced by counties with higher populations #
+# Downward sloping lines are influenced by counties with lower populations #
+
+# Next I was asked to investigate if there was relation between a specific religion and the proportion of non-religious people #
+# To do this I started by isolating the Non-Religious category of the data as follows #
+
+non_religious_data <- religions_tidy %>%
+  filter(Religion == "Non-Religious") %>%
+  select(County, Non_Religious_Prop = Proportion)
+
+# Then I would create an object that joined the non-religious proportion column to each of the religions by the counties # 
+# That looks as follows #
+
+religion_vs_nonreligious <- religions_tidy %>%
+  filter(Religion != "Non-Religious") %>%
+  left_join(non_religious_data, by = "County")
+
+# Finally, I would plot that object with a line of best fit #
+# This line of best fit would compare the propotion of each religion by county to the proportion each county had of non-religious people #
+
+ggplot(religion_vs_nonreligious, aes(x = Proportion, y = Non_Religious_Prop)) +
+  geom_point(color = "steelblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "solid") +
+  facet_wrap(~ Religion, scales = "free") +
+  labs(
+    title = "Specific Religion Proportion vs. Non-Religious Proportion",
+    x = "Proportion of Specific Religion",
+    y = "Proportion of Non-Religious People"
+  ) +
+  theme_minimal()
+
+# When looking at the results the best fit line tells us the impact of the proportion of non religious people in certain counties on certain religions #
+# Slopes that are flat show that there is not much of a relationship between the proportion of non-religious people versus that specific religion # 
+# An upward sloping line shows a positive correlation which means in counties with a higher proportion of that specific religions people there is also a higher proportion of non religious people #
+# And lines with a downward slope show that when the specific religion has a higher proportion of people in the population there is a smaller proportion of non religious people in that county # # The most interesting graph I took note of was the LDS graph which shows a pretty strong relationship between having more people being LDS and much lower proportion of non-religious people #
