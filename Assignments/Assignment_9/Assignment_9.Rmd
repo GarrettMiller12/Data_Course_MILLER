@@ -42,3 +42,131 @@ ____________
 + That means I want to see, in your html report, your process of model evaluation and selection. Here's an [example](https://gzahn.github.io/data-course/Repository/Assignments/Assignment_9/example.html){target="_blank"}
 + Upload your **self-contained** R project, including knitted HTML report, to GitHub in *your* Assignment_9 directory
 
+
+# First I had to load in the required packages #
+
+library(tidyverse)
+library(broom)
+library(readxl)
+
+# Then I had to load in the data set that I would be using and analyzing #
+
+grad <- read_csv("GradSchool_Admissions.csv")
+
+# Then I had to clean up some of the data to make it more usable in R studio #
+# The first thing I did was convert the rank column into a categorical factor with 1 as the baseline #
+
+grad_clean <- grad %>%
+  mutate(
+    admit_factor = factor(admit, levels = c(0, 1), labels = c("No", "Yes")),
+    rank = factor(rank)
+  )
+
+# Then I wanted to see what that now looked like using this code #
+
+glimpse(grad_clean)
+
+# Then I wanted to check for missing values in each column #
+
+colSums(is.na(grad_clean))
+
+# Then I continued using the clean data and summarized count, admission rate, mean gre, and mean gpa for each rank level #
+
+grad_clean %>%
+  group_by(rank) %>%
+  summarise(
+    n = n(),
+    admit_rate = mean(admit),
+    mean_gre = mean(gre),
+    mean_gpa = mean(gpa),
+    .groups = "drop"
+  )
+
+# Then I needed to change the data from wide format to long format #
+
+grad_long <- grad_clean %>%
+  pivot_longer(cols = c(gre, gpa), names_to = "metric", values_to = "score")
+  
+# Then it was time to start plotting #
+# I decided to make box plots #
+# The first plot compares the test scores and the GPA of students who had been admitted and those that had not #
+# This first graph shows that the students who did get admitted often have higher GRE scoes and GPAs. #
+
+ggplot(grad_long, aes(x = admit_factor, y = score, fill = admit_factor)) +
+  geom_boxplot(alpha = 0.75, outlier.alpha = 0.5) +
+  facet_wrap(~ metric, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+# This next plot shows the admission percentage for each school rank # 
+# This plot demonstrates that the admission rates of undergradautes from a rank 1 school is much hiugher than a student from a rank 4 school #
+
+ggplot(grad_clean, aes(x = rank, fill = admit_factor)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+  
+# After that it was time to generate a model for the data set #
+# I decided to just do one model that investigates the importance of each variable rather than making a different model for each factor # 
+# That code looked like this #
+  
+logit_model <- glm(admit ~ gre + gpa + rank, data = grad_clean, family = binomial)
+
+# this summary command shows the generated raw log-odds output #
+# The tidy command gives the odds ratios # 
+
+summary(logit_model)
+tidy(logit_model, exponentiate = TRUE, conf.int = TRUE)
+  
+# These scripts demonstrate the importance of each of the factors #
+# In the tidy data the code looks at each factor individually and generates a ratio of how much each factor helps or hurts your odds of admission #
+# After running the data it is is clear that increasing yoru GRE scores and your GPA have a strong connection to increasing your odds of being admitted #
+# It also demonstrates that coming from a rank 1 school is much better than a rank 2 and even coming from a rank four school decreases your chances of being admitted all the way down to 20 % #
+# These are very interesting numbers in terms of how to get the best chance of making it into your desired school #
+# It also gives insight into how to imporve your chances of being admitted #
+
+# Next I wanted to look at each applicant in the data and give them a predicted probability of admission using this given model # 
+# That was done using the code below #
+
+grad_pred <- grad_clean %>%
+  mutate(pred_prob = predict(logit_model, type = "response"))
+
+# You can then look at that data using the following code #
+
+head(grad_pred)
+
+# Next I wanted to generate a plot with a predicted probability curve for each rank #
+# First I had to create a table of every possible combination of the values in the original data #
+# The mutate portion takes each of the 400 hypothetical students created in the expand_grid and calculates the predicted admission probability for each so they can then be plotted on the ggplot after that #
+# That code looks like the following #
+
+pred_grid <- expand_grid(
+  gpa = seq(min(grad_clean$gpa), max(grad_clean$gpa), length.out = 100),
+  gre = mean(grad_clean$gre),
+  rank = factor(1:4, levels = levels(grad_clean$rank))
+) %>%
+  mutate(pred_prob = predict(logit_model, newdata = ., type = "response"))
+
+# After building that grid it is now time to plot it on a predicted probability curve # 
+# That code goes as follows #
+
+ggplot(pred_grid, aes(x = gpa, y = pred_prob, color = rank)) +
+  geom_line(linewidth = 1.1) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  labs(
+    x = "GPA",
+    y = "Predicted Probability of Admission",
+    color = "School Rank"
+  ) +
+  theme_minimal()
+
+
+# After cleaning the data, running it through ggplot for exploratory data analysis it is clear that all three of the factors generated play a statistically significant role in the probability of a student to get admitted or not #
+# The data clearly shows that the higher your GRE scores the more likely you are to be admitted. #
+# It shows that the higher your GPA is the more likely you are to be admitted # 
+# And it demonstrates that what rank fo undergraduate school you come from also plays a significant role. #
+# The final data graph visibly demonstrates the role each factor plays and what it means for the slope of your predicted probablity of admission. #
+
+
+  
